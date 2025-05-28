@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>亲爱的，别生气啦~</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  
+  <!-- 配置Tailwind自定义主题 -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            love: {
+              light: '#FFCCD5',
+              DEFAULT: '#FF8FA3',
+              dark: '#FF4D6D',
+              deeper: '#C9184A'
+            },
+            cute: {
+              light: '#FFE5EC',
+              DEFAULT: '#FFB3C1',
+              dark: '#FF85A1'
+            }
+          },
+          fontFamily: {
+            cute: ['"Comic Sans MS"', '"Marker Felt"', 'Arial', 'sans-serif'],
+            love: ['"Brush Script MT"', 'cursive', 'sans-serif']
+          },
+        },
+      }
+    }
+  </script>
+  
+  <style type="text/tailwindcss">
+    @layer utilities {
+      .text-shadow {
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+      }
+      .text-glow {
+        text-shadow: 0 0 10px rgba(255, 143, 163, 0.8), 0 0 20px rgba(255, 143, 163, 0.5);
+      }
+      .animate-float {
+        animation: float 3s ease-in-out infinite;
+      }
+      .animate-beat {
+        animation: beat 1.5s ease-in-out infinite;
+      }
+      .animate-fall {
+        animation: fall linear forwards;
+      }
+      .animate-spin-slow {
+        animation: spin 20s linear infinite;
+      }
+      .animate-bounce-slow {
+        animation: bounce 3s infinite;
+      }
+      .gradient-bg {
+        background: linear-gradient(135deg, #FFC2D1 0%, #FFB3C1 50%, #FF85A1 100%);
+      }
+      .card-hover {
+        transition: all 0.3s ease;
+      }
+      .card-hover:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 30px rgba(255, 77, 109, 0.2);
+      }
+      .btn-pulse {
+        animation: pulse 2s infinite;
+      }
+      .typing-cursor {
+        border-right: 0.2em solid;
+        animation: cursor-blink 1s step-end infinite;
+      }
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    @keyframes beat {
+      0% { transform: scale(1); }
+      25% { transform: scale(1.2); }
+      40% { transform: scale(1); }
+      60% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    
+    @keyframes fall {
+      to {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+    }
+    
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+    
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(255, 77, 109, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 77, 109, 0);
+      }
+    }
+    
+    @keyframes cursor-blink {
+      from, to { border-color: transparent }
+      50% { border-color: currentColor }
+    }
+  </style>
+</head>
+<body class="font-cute bg-love-light min-h-screen overflow-x-hidden">
+  <!-- 爱心背景 -->
+  <div id="heartContainer" class="fixed inset-0 pointer-events-none z-0"></div>
+  
+  <!-- 主容器 -->
+  <div class="relative z-10 min-h-screen flex flex-col">
+    <!-- 顶部导航 -->
+    <header class="sticky top-0 bg-white/80 backdrop-blur-md shadow-md z-50 transition-all duration-300">
+      <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <h1 class="text-love-dark font-love text-3xl md:text-4xl text-glow">
+          <i class="fa fa-heart animate-beat mr-2"></i>爱你哟
+        </h1>
+        <nav class="hidden md:flex space-x-6">
+          <a href="#home" class="text-love-dark hover:text-love-deeper transition-colors">首页</a>
+          <a href="#apology" class="text-love-dark hover:text-love-deeper transition-colors">道歉信</a>
+          <a href="#gallery" class="text-love-dark hover:text-love-deeper transition-colors">我们的回忆</a>
+          <a href="#gift" class="text-love-dark hover:text-love-deeper transition-colors">惊喜礼物</a>
+          <a href="#promise" class="text-love-dark hover:text-love-deeper transition-colors">我的承诺</a>
+        </nav>
+        <button id="menuToggle" class="md:hidden text-love-dark text-2xl">
+          <i class="fa fa-bars"></i>
+        </button>
+      </div>
+      
+      <!-- 移动端菜单 -->
+      <div id="mobileMenu" class="md:hidden hidden bg-white shadow-lg absolute w-full">
+        <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
+          <a href="#home" class="text-love-dark hover:text-love-deeper py-2 border-b border-love-light">首页</a>
+          <a href="#apology" class="text-love-dark hover:text-love-deeper py-2 border-b border-love-light">道歉信</a>
+          <a href="#gallery" class="text-love-dark hover:text-love-deeper py-2 border-b border-love-light">我们的回忆</a>
+          <a href="#gift" class="text-love-dark hover:text-love-deeper py-2 border-b border-love-light">惊喜礼物</a>
+          <a href="#promise" class="text-love-dark hover:text-love-deeper py-2">我的承诺</a>
+        </div>
+      </div>
+    </header>
+    
+    <!-- 主要内容 -->
+    <main class="flex-grow">
+      <!-- 欢迎部分 -->
+      <section id="home" class="gradient-bg min-h-[90vh] flex items-center justify-center text-center p-4">
+        <div class="container mx-auto">
+          <div class="bg-white/90 rounded-3xl shadow-2xl p-8 md:p-12 max-w-3xl mx-auto">
+            <div class="flex justify-center mb-6">
+              <div class="w-24 h-24 rounded-full bg-love overflow-hidden border-4 border-white shadow-lg animate-float">
+                <img src="https://picsum.photos/seed/girlfriend/200/200" alt="亲爱的" class="w-full h-full object-cover">
+              </div>
+            </div>
+            <h2 id="typingText" class="text-love-deeper font-love text-[clamp(2.5rem,5vw,4rem)] mb-6 text-glow">
+              亲爱的，别生气了嘛~
+            </h2>
+            <p class="text-love-dark text-xl md:text-2xl mb-8">
+              我知道错了，你就原谅我这一次好不好？
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+              <button id="forgiveBtn" class="bg-love hover:bg-love-dark text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition-all hover:scale-105 active:scale-95 btn-pulse">
+                <i class="fa fa-heart mr-2"></i>原谅你啦
+              </button>
+              <button id="angryBtn" class="bg-white hover:bg-gray-100 text-love-dark font-bold py-3 px-8 rounded-full border-2 border-love shadow-lg transform transition-all hover:scale-105 active:scale-95">
+                <i class="fa fa-angry mr-2"></i>还是很生气
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- 道歉信部分 -->
+      <section id="apology" class="py-20 px-4 bg-cute-light">
+        <div class="container mx-auto">
+          <h2 class="text-center text-love-deeper font-love text-[clamp(2rem,4vw,3rem)] mb-12 text-glow">
+            <i class="fa fa-envelope-o mr-3"></i>给我最爱的宝贝
+          </h2>
+          
+          <div class="max-w-3xl mx-auto bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 md:p-12 relative overflow-hidden">
+            <!-- 装饰元素 -->
+            <div class="absolute top-0 left-0 w-full h-full pointer-events-none">
+              <div class="absolute top-4 left-4 text-love opacity-20 text-6xl"><i class="fa fa-heart"></i></div>
+              <div class="absolute bottom-4 right-4 text-love opacity-20 text-6xl"><i class="fa fa-heart"></i></div>
+              <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-love opacity-10 text-9xl"><i class="fa fa-heart"></i></div>
+            </div>
+            
+            <div class="relative">
+              <p class="text-love-dark text-lg md:text-xl leading-relaxed mb-6">
+                亲爱的，我怀着万分愧疚的心情写下这封信。最近我的表现让你受委屈了，我真的知道错了。
+              </p>
+              <p class="text-love-dark text-lg md:text-xl leading-relaxed mb-6">
+                你在我生命中是最重要的人，我却因为自己的疏忽让你不开心。这是我最不愿意看到的事情。
+              </p>
+              <p class="text-love-dark text-lg md:text-xl leading-relaxed mb-6">
+                我保证以后会更加细心，更加体贴，更加珍惜你。不会再让你受一点点委屈。
+              </p>
+              <p class="text-love-dark text-lg md:text-xl leading-relaxed mb-8">
+                希望你能原谅我这一次，给我一个改过自新的机会。我会用行动证明我对你的爱永远不变！
+              </p>
+              <p class="text-love-deeper font-love text-2xl md:text-3xl text-right">
+                永远爱你的人
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- 回忆相册部分 -->
+      <section id="gallery" class="py-20 px-4 bg-white">
+        <div class="container mx-auto">
+          <h2 class="text-center text-love-deeper font-love text-[clamp(2rem,4vw,3rem)] mb-12 text-glow">
+            <i class="fa fa-images mr-3"></i>我们的美好回忆
+          </h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- 照片卡片1 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover">
+              <div class="h-64 overflow-hidden">
+                <img src="https://picsum.photos/seed/memory1/600/400" alt="我们的回忆" class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500">
+              </div>
+              <div class="p-6">
+                <h3 class="text-love-dark font-bold text-xl mb-2">第一次约会</h3>
+                <p class="text-gray-700">那是一个阳光明媚的日子，我第一次见到了你，心跳瞬间加速。</p>
+              </div>
+            </div>
+            
+            <!-- 照片卡片2 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover">
+              <div class="h-64 overflow-hidden">
+                <img src="https://picsum.photos/seed/memory2/600/400" alt="我们的回忆" class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500">
+              </div>
+              <div class="p-6">
+                <h3 class="text-love-dark font-bold text-xl mb-2">一起旅行</h3>
+                <p class="text-gray-700">和你一起看遍世间美景，是我最大的心愿。</p>
+              </div>
+            </div>
+            
+            <!-- 照片卡片3 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden card-hover">
+              <div class="h-64 overflow-hidden">
+                <img src="https://picsum.photos/seed/memory3/600/400" alt="我们的回忆" class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500">
+              </div>
+              <div class="p-6">
+                <h3 class="text-love-dark font-bold text-xl mb-2">温馨时刻</h3>
+                <p class="text-gray-700">只要和你在一起，平凡的日子也变得特别美好。</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 新增：回忆轮播 -->
+          <div class="mt-16 max-w-3xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div id="carousel" class="relative h-80">
+              <div class="absolute inset-0 transition-opacity duration-1000 opacity-100" data-index="0">
+                <img src="https://picsum.photos/seed/carousel1/800/400" alt="回忆轮播" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+                  <div class="p-6 text-white">
+                    <h3 class="font-bold text-xl mb-2">第一次牵手</h3>
+                    <p>那一刻，我知道你就是我要找的人。</p>
+                  </div>
+                </div>
+              </div>
+              <div class="absolute inset-0 transition-opacity duration-1000 opacity-0" data-index="1">
+                <img src="https://picsum.photos/seed/carousel2/800/400" alt="回忆轮播" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+                  <div class="p-6 text-white">
+                    <h3 class="font-bold text-xl mb-2">生日惊喜</h3>
+                    <p>看到你开心的笑容，是我最大的满足。</p>
+                  </div>
+                </div>
+              </div>
+              <div class="absolute inset-0 transition-opacity duration-1000 opacity-0" data-index="2">
+                <img src="https://picsum.photos/seed/carousel3/800/400" alt="回忆轮播" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+                  <div class="p-6 text-white">
+                    <h3 class="font-bold text-xl mb-2">浪漫晚餐</h3>
+                    <p>和你一起度过的每一刻，都是珍贵的回忆。</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 轮播控制按钮 -->
+              <button id="prevSlide" class="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 flex items-center justify-center transition-all">
+                <i class="fa fa-chevron-left"></i>
+              </button>
+              <button id="nextSlide" class="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 flex items-center justify-center transition-all">
+                <i class="fa fa-chevron-right"></i>
+              </button>
+              
+              <!-- 轮播指示器 -->
+              <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                <button class="w-3 h-3 rounded-full bg-white opacity-50 carousel-indicator active" data-index="0"></button>
+                <button class="w-3 h-3 rounded-full bg-white opacity-50 carousel-indicator" data-index="1"></button>
+                <button class="w-3 h-3 rounded-full bg-white opacity-50 carousel-indicator" data-index="2"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- 惊喜礼物部分 -->
+      <section id="gift" class="py-20 px-4 bg-cute-light">
+        <div class="container mx-auto">
+          <h2 class="text-center text-love-deeper font-love text-[clamp(2rem,4vw,3rem)] mb-12 text-glow">
+            <i class="fa fa-gift mr-3"></i>给你的惊喜礼物
+          </h2>
+          
+          <div class="max-w-2xl mx-auto">
+            <div id="giftBox" class="relative h-80 w-full bg-love rounded-3xl shadow-2xl cursor-pointer overflow-hidden transform transition-all hover:scale-105 active:scale-95">
+              <div class="absolute inset-0 bg-love-dark/30 flex items-center justify-center">
+                <h3 class="text-white font-bold text-3xl md:text-4xl text-shadow">点击打开礼物</h3>
+              </div>
+              
+              <!-- 礼物装饰 -->
+              <div class="absolute top-1/2 left-0 w-full h-16 bg-love-deeper transform -translate-y-1/2"></div>
+              <div class="absolute left-1/2 top-0 w-16 h-full bg-love-deeper transform -translate-x-1/2"></div>
+              <div class="absolute left-1/2 top-1/2 w-24 h-24 bg-white rounded-full transform -translate-x-1/2 -translate-y-1/2 flex items-center justify-center">
+                <div class="w-16 h-16 bg-love-deeper rounded-full flex items-center justify-center">
+                  <i class="fa fa-heart text-white text-3xl animate-beat"></i>
+                </div>
+              </div>
+              
+              <!-- 礼物内容 (默认隐藏) -->
+              <div id="giftContent" class="hidden absolute inset-0 bg-white p-8 flex flex-col items-center justify-center text-center">
+                <h3 class="text-love-deeper font-love text-3xl mb-4">亲爱的，我爱你</h3>
+                <p class="text-love-dark text-xl mb-6">这份礼物是我对你满满的爱和歉意，希望你能喜欢！</p>
+                <div class="mb-6 text-love-deeper text-5xl animate-beat">❤️</div>
+                <p class="text-love-dark text-lg">我会永远爱你，守护你，珍惜你！</p>
+                
+                <!-- 新增：音乐播放 -->
+                <div class="mt-8">
+                  <button id="playMusic" class="bg-love hover:bg-love-dark text-white font-bold py-2 px-6 rounded-full shadow-md transform transition-all hover:scale-105 active:scale-95">
+                    <i class="fa fa-music mr-2"></i>播放爱的音乐
+                  </button>
+                  <audio id="loveMusic" loop>
+                    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+                  </audio>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-8 text-center">
+              <p class="text-love-dark text-lg">还有更多惊喜等着你哦~</p>
+              <div id="messageBtn" class="mt-4 inline-block bg-love hover:bg-love-dark text-white font-bold py-3 px-8 rounded-full shadow-lg cursor-pointer transform transition-all hover:scale-105 active:scale-95">
+                <i class="fa fa-comment-o mr-2"></i>点我有话说
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- 新增：我的承诺部分 -->
+      <section id="promise" class="py-20 px-4 bg-white">
+        <div class="container mx-auto">
+          <h2 class="text-center text-love-deeper font-love text-[clamp(2rem,4vw,3rem)] mb-12 text-glow">
+            <i class="fa fa-heart mr-3"></i>我对你的承诺
+          </h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <!-- 承诺卡片1 -->
+            <div class="bg-love-light rounded-xl shadow-lg p-6 card-hover">
+              <div class="flex items-center mb-4">
+                <div class="w-12 h-12 rounded-full bg-love flex items-center justify-center text-white mr-4">
+                  <i class="fa fa-clock-o text-xl"></i>
+                </div>
+                <h3 class="text-love-deeper font-bold text-xl">永远陪伴</h3>
+              </div>
+              <p class="text-gray-700">我承诺会一直在你身边，无论顺境还是逆境，都会紧紧握住你的手，与你共同面对生活的挑战。</p>
+            </div>
+            
+            <!-- 承诺卡片2 -->
+            <div class="bg-love-light rounded-xl shadow-lg p-6 card-hover">
+              <div class="flex items-center mb-4">
+                <div class="w-12 h-12 rounded-full bg-love flex items-center justify-center text-white mr-4">
+                  <i class="fa fa-shield text-xl"></i>
+                </div>
+                <h3 class="text-love-deeper font-bold text-xl">保护你</h3>
+              </div>
+              <p class="text-gray-700">我会像骑士保护公主一样保护你，不让你受到任何伤害，给你安全感，做你坚强的后盾。</p>
+            </div>
+            
+            <!-- 承诺卡片3 -->
+            <div class="bg-love-light rounded-xl shadow-lg p-6 card-hover">
+              <div class="flex items-center mb-4">
+                <div class="w-12 h-12 rounded-full bg-love flex items-center justify-center text-white mr-4">
+                  <i class="fa fa-smile-o text-xl"></i>
+                </div>
+                <h3 class="text-love-deeper font-bold text-xl">让你开心</h3>
+              </div>
+              <p class="text-gray-700">我会努力让你每天都开开心心的，做你生活中的开心果，为你制造浪漫和惊喜。</p>
+            </div>
+            
+            <!-- 承诺卡片4 -->
+            <div class="bg-love-light rounded-xl shadow-lg p-6 card-hover">
+              <div class="flex items-center mb-4">
+                <div class="w-12 h-12 rounded-full bg-love flex items-center justify-center text-white mr-4">
+                  <i class="fa fa-heart text-xl"></i>
+                </div>
+                <h3 class="text-love-deeper font-bold text-xl">永远爱你</h3>
+              </div>
+              <p class="text-gray-700">我的爱只会随着时间的推移而增长，永远不会减少。我会用一生的时间去爱你，珍惜你。</p>
+            </div>
+          </div>
+          
+          <!-- 新增：爱情计算器 -->
+          <div class="mt-16 max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8 text-center">
+            <h3 class="text-love-deeper font-love text-2xl mb-6">爱情计算器</h3>
+            <p class="text-love-dark mb-8">输入我们的名字，看看我们的爱情指数有多高！</p>
+            
+            <div class="flex flex-col sm:flex-row gap-4 mb-6 max-w-md mx-auto">
+              <input type="text" id="name1" placeholder="你的名字" class="flex-1 px-4 py-3 rounded-lg border-2 border-love focus:outline-none focus:ring-2 focus:ring-love">
+              <input type="text" id="name2" placeholder="TA的名字" class="flex-1 px-4 py-3 rounded-lg border-2 border-love focus:outline-none focus:ring-2 focus:ring-love">
+            </div>
+            
+            <button id="calculateLove" class="bg-love hover:bg-love-dark text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition-all hover:scale-105 active:scale-95">
+              <i class="fa fa-calculator mr-2"></i>计算爱情指数
+            </button>
+            
+            <div id="loveResult" class="mt-8 hidden">
+              <div class="relative h-10 bg-gray-200 rounded-full overflow-hidden mb-4">
+                <div id="loveBar" class="absolute left-0 top-0 h-full bg-love transition-all duration-1000" style="width: 0%"></div>
+              </div>
+              <h4 id="lovePercentage" class="text-love-deeper font-bold text-2xl"></h4>
+              <p id="loveMessage" class="text-love-dark mt-2"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- 情话弹窗 (默认隐藏) -->
+      <div id="messageModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4 transform transition-all">
+          <button id="closeModal" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+            <i class="fa fa-times text-xl"></i>
+          </button>
+          <h3 class="text-love-deeper font-love text-2xl md:text-3xl mb-6 text-center">我想对你说...</h3>
+          <p id="loveMessage" class="text-love-dark text-lg leading-relaxed mb-6">
+            你是我生命中最美的遇见，每一天爱你都比昨天更多一点。
+          </p>
+          <div class="text-center">
+            <button id="nextMessage" class="bg-love hover:bg-love-dark text-white font-bold py-2 px-6 rounded-full shadow-md transform transition-all hover:scale-105 active:scale-95">
+              <i class="fa fa-refresh mr-2"></i>换一句
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer class="bg-love-deeper text-white py-8">
+      <div class="container mx-auto px-4 text-center">
+        <p class="mb-4">❤️ 永远爱你的人 ❤️</p>
+        <p class="text-sm opacity-80">用❤️制作，希望你能开心每一天</p>
+      </div>
+    </footer>
+  </div>
+  
+  <script>
+    // 爱心背景效果
+    function createHearts() {
+      const container = document.getElementById('heartContainer');
+      const hearts = ['❤️', '💖', '💗', '💓', '💕', '💞', '💘', '💝'];
+      
+      for (let i = 0; i < 30; i++) {
+        const heart = document.createElement('div');
+        heart.innerHTML = hearts[Math.floor(Math.random() * hearts.length)];
+        heart.className = 'absolute text-2xl md:text-3xl animate-fall';
+        heart.style.left = `${Math.random() * 100}vw`;
+        heart.style.top = `${-Math.random() * 100}vh`;
+        heart.style.animationDuration = `${Math.random() * 5 + 5}s`;
+        heart.style.opacity = Math.random() * 0.5 + 0.5;
+        container.appendChild(heart);
+        
+        // 动画结束后重新定位
+        heart.addEventListener('animationend', () => {
+          heart.style.left = `${Math.random() * 100}vw`;
+          heart.style.top = `${-Math.random() * 100}vh`;
+          heart.style.animationDuration = `${Math.random() * 5 + 5}s`;
+          heart.style.opacity = Math.random() * 0.5 + 0.5;
+          heart.classList.remove('animate-fall');
+          void heart.offsetWidth; // 触发重绘
+          heart.classList.add('animate-fall');
+        });
+      }
+    }
+    
+    // 打字效果
+    function typeText(element, text, speed) {
+      let i = 0;
+      element.textContent = '';
+      
+      const typing = setInterval(() => {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+        } else {
+          clearInterval(typing);
+          // 添加光标闪烁效果
+          element.classList.add('typing-cursor');
+        }
+      }, speed);
+    }
+    
+    // 原谅按钮效果
+    document.getElementById('forgiveBtn').addEventListener('click', function() {
+      alert('太好啦！我就知道你最好了！❤️');
+      // 添加庆祝效果
+      createCelebration();
+    });
+    
+    // 生气按钮效果
+    document.getElementById('angryBtn').addEventListener('click', function() {
+      alert('别生气了嘛~ 我会好好改正的！🥺');
+    });
+    
+    // 移动端菜单切换
+    document.getElementById('menuToggle').addEventListener('click', function() {
+      const mobileMenu = document.getElementById('mobileMenu');
+      mobileMenu.classList.toggle('hidden');
+    });
+    
+    // 礼物盒点击效果
+    document.getElementById('giftBox').addEventListener('click', function() {
+      const giftContent = document.getElementById('giftContent');
+      giftContent.classList.toggle('hidden');
+    });
+    
+    // 音乐播放控制
+    const playMusic = document.getElementById('playMusic');
+    const loveMusic = document.getElementById('loveMusic');
+    
+    playMusic.addEventListener('click', function() {
+      if (loveMusic.paused) {
+        loveMusic.play();
+        playMusic.innerHTML = '<i class="fa fa-pause mr-2"></i>暂停音乐';
+      } else {
+        loveMusic.pause();
+        playMusic.innerHTML = '<i class="fa fa-music mr-2"></i>播放爱的音乐';
+      }
+    });
+    
+    // 情话弹窗
+    const messageBtn = document.getElementById('messageBtn');
+    const messageModal = document.getElementById('messageModal');
+    const closeModal = document.getElementById('closeModal');
+    const modalLoveMessage = document.getElementById('loveMessage');
+    const nextMessage = document.getElementById('nextMessage');
+    
+    // 情话列表
+    const loveMessages = [
+      '你是我生命中最美的遇见，每一天爱你都比昨天更多一点。',
+      '无论风雨还是晴天，我都会一直在你身边，牵着你的手不放开。',
+      '你的笑容是我见过最美的风景，希望我能成为你生命中永远的阳光。',
+      '我愿意用一生的时间，去诠释什么是真正的爱——那就是无条件地爱你。',
+      '你是我温暖的港湾，是我心灵的归宿，我爱你，永远不变。',
+      '在这纷繁复杂的世界里，你是我唯一想停留的风景。',
+      '希望我们的爱情像美酒一样，越陈越香，直到永远。',
+      '你是我生命中最璀璨的星辰，照亮了我前行的道路。',
+      '我不需要太多，只要有你在我身边，一切就足够了。',
+      '无论未来如何，我都会紧紧握住你的手，与你一起面对所有的挑战。'
+    ];
+    
+    // 显示随机情话
+    function showRandomMessage() {
+      const randomIndex = Math.floor(Math.random() * loveMessages.length);
+      modalLoveMessage.textContent = loveMessages[randomIndex];
+    }
+    
+    messageBtn.addEventListener('click', function() {
+      showRandomMessage();
+      messageModal.classList.remove('hidden');
+    });
+    
+    closeModal.addEventListener('click', function() {
+      messageModal.classList.add('hidden');
+    });
+    
+    nextMessage.addEventListener('click', showRandomMessage);
+    
+    // 点击模态框外部关闭
+    messageModal.addEventListener('click', function(e) {
+      if (e.target === messageModal) {
+        messageModal.classList.add('hidden');
+      }
+    });
+    
+    // 页面滚动时导航栏效果
+    window.addEventListener('scroll', function() {
+      const header = document.querySelector('header');
+      if (window.scrollY > 50) {
+        header.classList.add('py-2', 'shadow-lg');
+        header.classList.remove('py-3', 'shadow-md');
+      } else {
+        header.classList.add('py-3', 'shadow-md');
+        header.classList.remove('py-2', 'shadow-lg');
+      }
+    });
+    
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        
+        if (targetElement) {
+          // 关闭移动菜单（如果打开）
+          document.getElementById('mobileMenu').classList.add('hidden');
+          
+          // 平滑滚动到目标位置
+          window.scrollTo({
+            top: targetElement.offsetTop - 80,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+    
+    // 回忆轮播
+    const carousel = document.getElementById('carousel');
+    const slides = carousel.querySelectorAll('[data-index]');
+    const indicators = document.querySelectorAll('.carousel-indicator');
+    const prevBtn = document.getElementById('prevSlide');
+    const nextBtn = document.getElementById('nextSlide');
+    let currentSlide = 0;
+    
+    function showSlide(index) {
+      slides.forEach(slide => {
+        slide.classList.add('opacity-0');
+        slide.classList.remove('opacity-100');
+      });
+      
+      indicators.forEach(indicator => {
+        indicator.classList.remove('active', 'opacity-100');
+        indicator.classList.add('opacity-50');
+      });
+      
+      slides[index].classList.add('opacity-100');
+      slides[index].classList.remove('opacity-0');
+      indicators[index].classList.add('active', 'opacity-100');
+      indicators[index].classList.remove('opacity-50');
+      
+      currentSlide = index;
+    }
+    
+    prevBtn.addEventListener('click', () => {
+      let newIndex = currentSlide - 1;
+      if (newIndex < 0) newIndex = slides.length - 1;
+      showSlide(newIndex);
+    });
+    
+    nextBtn.addEventListener('click', () => {
+      let newIndex = currentSlide + 1;
+      if (newIndex >= slides.length) newIndex = 0;
+      showSlide(newIndex);
+    });
+    
+    indicators.forEach(indicator => {
+      indicator.addEventListener('click', () => {
+        const index = parseInt(indicator.getAttribute('data-index'));
+        showSlide(index);
+      });
+    });
+    
+    // 自动轮播
+    setInterval(() => {
+      let newIndex = currentSlide + 1;
+      if (newIndex >= slides.length) newIndex = 0;
+      showSlide(newIndex);
+    }, 5000);
+    
+    // 爱情计算器
+    const calculateBtn = document.getElementById('calculateLove');
+    const name1Input = document.getElementById('name1');
+    const name2Input = document.getElementById('name2');
+    const loveResult = document.getElementById('loveResult');
+    const loveBar = document.getElementById('loveBar');
+    const lovePercentage = document.getElementById('lovePercentage');
+    const loveMessage = document.getElementById('loveMessage');
+    
+    calculateBtn.addEventListener('click', () => {
+      const name1 = name1Input.value.trim();
+      const name2 = name2Input.value.trim();
+      
+      if (!name1 || !name2) {
+        alert('请输入两个人的名字');
+        return;
+      }
+      
+      // 计算爱情指数（随机但看起来更真实）
+      const baseScore = Math.floor(Math.random() * 10) + 85; // 85-95之间
+      const randomFactor = Math.floor(Math.random() * 10); // 0-9之间
+      const score = Math.min(100, baseScore - randomFactor);
+      
+      // 设置结果文本
+      let message = '';
+      if (score >= 90) {
+        message = '你们的爱情是天造地设的一对！💑 无论遇到什么困难，都能一起克服。';
+      } else if (score >= 80) {
+        message = '你们的爱情非常美满！💕 彼此理解和支持，未来一定幸福。';
+      } else if (score >= 70) {
+        message = '你们的爱情很稳定！💖 只要多沟通，未来会更加美好。';
+      } else {
+        message = '你们的爱情需要更多的呵护！💘 互相包容，一定会越来越好。';
+      }
+      
+      // 显示结果
+      loveResult.classList.remove('hidden');
+      loveBar.style.width = `${score}%`;
+      lovePercentage.textContent = `${score}%`;
+      loveMessage.textContent = message;
+      
+      // 添加庆祝效果
+      setTimeout(createCelebration, 500);
+    });
+    
+    // 创建庆祝效果
+    function createCelebration() {
+      const container = document.getElementById('heartContainer');
+      const emojis = ['🎉', '💖', '✨', '🎊', '❤️', '💘', '💝', '🌟'];
+      
+      for (let i = 0; i < 50; i++) {
+        const emoji = document.createElement('div');
+        emoji.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+        emoji.className = 'absolute text-2xl md:text-3xl animate-fall';
+        emoji.style.left = `${Math.random() * 100}vw`;
+        emoji.style.top = `${-Math.random() * 100}vh`;
+        emoji.style.animationDuration = `${Math.random() * 3 + 2}s`;
+        emoji.style.opacity = Math.random() * 0.8 + 0.2;
+        container.appendChild(emoji);
+        
+        // 3秒后移除
+        setTimeout(() => {
+          emoji.remove();
+        }, 5000);
+      }
+    }
+    
+    // 初始化
+    createHearts();
+    
+    // 页面加载后显示打字效果
+    window.addEventListener('load', () => {
+      const typingText = document.getElementById('typingText');
+      typeText(typingText, '亲爱的，别生气了嘛~', 100);
+    });
+  </script>
+</body>
+</html>
+    
